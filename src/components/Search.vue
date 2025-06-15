@@ -6,6 +6,22 @@
       placeholder="Buscar actividad..."
       class="busqueda"
     />
+    <select
+          v-model="inputCategory"
+          class="selectorCategoria">
+          <option value="">Todas las categorías</option>
+          <option value="bienestar">Bienestar</option>
+          <option value="gastronomia">Gastronomía</option>
+          <option value="arte">Arte</option>
+          <option value="aventura">Aventura</option>
+          <option value="cultura">Cultura</option>
+        </select>
+        <input
+          type="number"
+          v-model="inputPrice"
+          placeholder="Precio máximo"
+          class="precioMax"
+        />
   </div>
 </template>
 
@@ -13,30 +29,43 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  modelValue: String
-})
+  searchTerm: String,
+  selectedCategory: String,
+  maxPrice: [Number, String]
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:searchTerm', 'update:selectedCategory', 'update:maxPrice']);
+
 
 const inputValue = computed({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
-})
+  get: () => props.searchTerm,
+  set: (val) => emit('update:searchTerm', val)
+});
+
+const inputCategory = computed({
+  get: () => props.selectedCategory,
+  set: (val) => emit('update:selectedCategory', val)
+});
+
+const inputPrice = computed({
+  get: () => props.maxPrice,
+  set: (val) => emit('update:maxPrice', val)
+});
 </script>
 
 <style scoped>
 .buscador-contenedor {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content:space-around;
+    align-items: center;
 }
-
-.busqueda {
-  width: 50%;
-  height: 35px;
-  padding-left: 10px;
-  border: 1px solid var(--color-primario);
-  border-radius: 5px;
-  color: var(--color-texto-secundario);
+.busqueda, .selectorCategoria, .precioMax{
+    width: 30%;
+    height: 35px;
+    padding-left: 10px;
+    border: 1px solid var(--color-primario); 
+    border-radius: 5px;
+    color: var(--color-texto-secundario);
 }
 </style>

@@ -2,51 +2,64 @@
   <div class="activities-page">
     <h1 class="titulo">Actividades Disponibles</h1>
 
-    <Search v-model="searchTerm" />
+    <Search
+      v-model:searchTerm="searchTerm"
+      v-model:selectedCategory="selectedCategory"
+      v-model:maxPrice="maxPrice"
+    />
 
-    <div class="activity">
+    <div v-if="loading">Cargando...</div>
+
+    <div v-else class="activity">
       <ActivityCard
         v-for="actividad in actividadesFiltradas"
         :key="actividad.activity_id"
         :activity="actividad"
+        :loading="loading"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Search from '../components/Search.vue'
 import ActivityCard from '../components/ActivityCard.vue'
+import {fetchActivities} from '../services/activityService.js'
 
 const searchTerm = ref('')
+const selectedCategory = ref('')
+const maxPrice = ref('')
 
-const actividades = ref([
-  {
-    activity_id: 1,
-    name: 'Senderismo en la montaña',
-    short_description: 'Una experiencia en plena naturaleza.',
-    images: ['https://images.pexels.com/photos/552958/pexels-photo-552958.jpeg']
-  },
-  {
-    activity_id: 2,
-    name: 'Clase de cocina italiana',
-    short_description: 'Aprende a preparar auténtica pasta casera.',
-    images: ['https://images.pexels.com/photos/2232/vegetables-italian-pizza-restaurant.jpg']
-  },
-  {
-    activity_id: 3,
-    name: 'Visita guiada a museo de arte',
-    short_description: 'Explora obras de arte clásicas y modernas.',
-    images: ['https://images.pexels.com/photos/356079/pexels-photo-356079.jpeg']
+const actividades = ref([])
+const loading = ref(true)
+
+const cargarActividades = async () => {
+  loading.value = true;
+  try {
+    actividades.value = await fetchActivities();
+  } catch (error) {
+    console.error("Error al cargar actividades:", error);
+  } finally {
+    loading.value = false;
   }
-])
+};
 
-const actividadesFiltradas = computed(() =>
-  actividades.value.filter((actividad) =>
-    actividad.name.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
-)
+onMounted(() => {
+  cargarActividades();
+});
+
+const actividadesFiltradas = computed(() => {
+  return actividades.value.filter(actividad => {
+    const nameMatch = actividad.name.toLowerCase().includes(searchTerm.value.toLowerCase());
+    const categoryMatch = selectedCategory.value ? actividad.category === selectedCategory.value : true;
+    const priceMatch = maxPrice.value ? actividad.price <= Number(maxPrice.value) : true;
+    return nameMatch && categoryMatch && priceMatch;
+  });
+});
+
+console.log(actividadesFiltradas.value);
+
 </script>
 
 <style scoped>
@@ -59,6 +72,7 @@ const actividadesFiltradas = computed(() =>
   font-weight: bold;
   margin-bottom: 1.5rem;
   text-align: center;
+  color: black;
 }
 
 .activity {

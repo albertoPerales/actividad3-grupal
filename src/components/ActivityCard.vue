@@ -26,6 +26,10 @@ defineProps({
     type: Object,
     required: true,
   },
+  loading: {
+    type: Boolean,
+    required: true,
+  },
 })
 </script>
 
@@ -33,6 +37,7 @@ defineProps({
 .activity-card {
   display: flex;
   align-items: flex-start;
+  width: 40vw;
   gap: 12px;
   padding: 10px;
   border: 1px solid #ddd;
@@ -43,7 +48,7 @@ defineProps({
 }
 
 .activity-card-image {
-  width: 10%;
+  width: 30%;
   height: 130px;
   object-fit: cover;
   border-radius: 8px;
